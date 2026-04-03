@@ -1,10 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     public float movementSpeed;
-
     public float gdrag;
 
     [SerializeField]
@@ -14,7 +14,6 @@ public class PlayerMovement : MonoBehaviour
     float verticalInput;
 
     Vector3 moveDirection;
-
     Rigidbody rb;
 
     public GameObject projectilePrefab;
@@ -29,7 +28,8 @@ public class PlayerMovement : MonoBehaviour
     {
         myInput();
         rb.linearDamping = gdrag;
-        if (Input.GetMouseButtonDown(0))
+
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Instantiate(projectilePrefab, transform.position, projectilePrefab.transform.rotation);
         }
@@ -39,16 +39,17 @@ public class PlayerMovement : MonoBehaviour
     {
         movePlayer();
     }
+
     private void myInput()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
+        var kb = Keyboard.current;
+        horizontalInput = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
+        verticalInput = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
     }
 
     private void movePlayer()
     {
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-
         rb.AddForce(moveDirection.normalized * movementSpeed * 10f, ForceMode.Force);
     }
 }
