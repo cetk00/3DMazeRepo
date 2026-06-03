@@ -31,7 +31,15 @@ public class PlayerMovement : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            Instantiate(projectilePrefab, transform.position, projectilePrefab.transform.rotation);
+            GameObject bullet = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+            bullet.transform.SetParent(null);
+
+            MoveForward mf = bullet.GetComponent<MoveForward>();
+            if (mf != null)
+                mf.setDirection(orientation.forward);
+            else
+                Debug.LogWarning("Bullet not found");
+
         }
     }
 

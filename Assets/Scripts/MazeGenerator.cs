@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 
 public class MazeGenerator : MonoBehaviour
@@ -22,6 +23,9 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField]
     private float _cellSize = 3f;
 
+    [SerializeField]
+    private GameObject _endFlag;
+
     void Start()
     {
         _mazeGrid = new MazeCell[_mazeWidth, _mazeDepth];
@@ -36,6 +40,8 @@ public class MazeGenerator : MonoBehaviour
         }
 
         GenerateMaze(null, _mazeGrid[0, 0]);
+        MazeCell endCell = FindFarthestCell(_mazeGrid[0, 0]);
+        SpawnEnd(endCell);
 
         if (_player != null)
         {
@@ -132,6 +138,68 @@ public class MazeGenerator : MonoBehaviour
             previousCell.ClearBackWall();
             currentCell.ClearFrontWall();
             return;
+        }
+    }
+
+
+    private MazeCell FindFarthestCell(MazeCell start)
+    {
+        var visited = new HashSet<MazeCell>();
+        var queue = new Queue<(MazeCell cell ,int dist)>();
+
+        queue.Enqueue((start, 0));
+        visited.Add(start);
+
+        MazeCell farthest = start;
+        int maxDist = 0;
+
+        while(queue.Count > 0)
+        {
+            var (current, dist) = queue.Dequeue();
+
+            if(dist > maxDist)
+            {
+                maxDist = dist;
+                farthest = current;
+            }
+
+            foreach(MazeCell neighbour in GetConnectedNeighbours(current))
+            {
+                if (!visited.Contains(neighbour))
+                {
+                    visited.Add(neighbour);
+                    queue.Enqueue((neighbour, dist + 1));
+                }
+            }
+        }
+        return farthest;
+    }
+
+    private IEnumerable<MazeCell> GetConnectedNeighbours(MazeCell cell)
+    {
+        int x = Mathf.RoundToInt(cell.transform.position.x / _cellSize);
+        int z = Mathf.RoundToInt(cell.transform.position.z / _cellSize);
+
+        if (x + 1 < _mazeWidth && !cell.hasRightWall)
+            yield return _mazeGrid[x + 1, z];
+
+        if (x - 1 >= 0 && !cell.hasLeftWall)
+            yield return _mazeGrid[x - 1, z];
+
+        if (z + 1 < _mazeDepth && !cell.hasFrontWall)
+            yield return _mazeGrid[x, z + 1];
+
+        if (z - 1 >= 0 && !cell.hasBackWall)
+            yield return _mazeGrid[x, z - 1];
+
+    }
+
+    private void SpawnEnd(MazeCell cell)
+    {
+        if (_endFlag != null)
+        {
+            GameObject end = Instantiate(_endFlag, cell.transform.position + Vector3.up, Quaternion.identity);
+            Debug.Log("End spawned at: " + end.transform.position);
         }
     }
 

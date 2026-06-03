@@ -4,15 +4,27 @@ public class MoveForward : MonoBehaviour
 {
 
     public float speed = 40.0f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private Vector3 _direction;
+    
+
     void Start()
     {
-        
+        if (_direction == Vector3.zero)
+            _direction = transform.forward;
+    }
+
+    public void setDirection(Vector3 direction)
+    {
+        _direction = direction.normalized;
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(Vector3.forward * Time.deltaTime * speed);
+        //float horizontal = Input.GetAxis("Horizontal");
+        //float vertical = Input.GetAxis("Vertical");
+        //Vector3 direction = new Vector3(horizontal, 0, vertical);
+
+        transform.Translate(_direction * Time.deltaTime * speed, Space.World);
     }
 }
