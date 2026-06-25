@@ -23,6 +23,9 @@ public class LevelCompleteScript : MonoBehaviour
         timer.enabled = false;
         timer.HideTimer();
 
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         float elapsed = timer.GetElapsedTime();
         int minutes = Mathf.FloorToInt(elapsed / 60);
         int seconds = Mathf.FloorToInt(elapsed % 60);
