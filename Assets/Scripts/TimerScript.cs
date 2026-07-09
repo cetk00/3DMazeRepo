@@ -21,6 +21,9 @@ public class Timer : MonoBehaviour
     {
         isCountdown = GameModeManager.Instance.IsCountdown();
         timeRemaining = countdownStartTime;
+
+        // Find inactive GameOver object 👇
+        gameOver = FindObjectOfType<GameOver>(true);
     }
 
     void Update()

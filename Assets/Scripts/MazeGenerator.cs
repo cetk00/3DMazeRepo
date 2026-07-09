@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.TerrainTools;
 using UnityEngine;
 
 public class MazeGenerator : MonoBehaviour
@@ -26,8 +25,20 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField]
     private GameObject _endFlag;
 
+    public bool IsGenerated { get; private set; } = false;
+
+    public int MazeWidth => _mazeWidth;
+    public int MazeDepth => _mazeDepth;
+    public float CellSize => _cellSize;
+
+
+
     void Start()
     {
+
+        int size = PlayerPrefs.GetInt("MazeSize", 10);
+        _mazeWidth = size;
+        _mazeDepth = size;
         _mazeGrid = new MazeCell[_mazeWidth, _mazeDepth];
 
         for (int x = 0; x < _mazeWidth; x++)
@@ -201,7 +212,13 @@ public class MazeGenerator : MonoBehaviour
             GameObject end = Instantiate(_endFlag, cell.transform.position + Vector3.up, Quaternion.identity);
             Debug.Log("End spawned at: " + end.transform.position);
         }
+
+        IsGenerated = true;
     }
 
+    
+
 }
+
+
 
